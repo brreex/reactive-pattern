@@ -1,12 +1,6 @@
 export interface Lesson {
-      id: string;
+      id: number;
       description: string;
-      seqNo: number;
-      duration: string;
-      url?: string;
-      tags?: string;
-      pro?: boolean;
-      longDescription?: string;
-      courseId?: string;
-      videoUrl?: string;
+      duration?: string;
+      completed?:boolean;
   }

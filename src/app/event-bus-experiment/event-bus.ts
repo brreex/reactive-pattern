@@ -28,7 +28,7 @@ class EventBus implements Subject {
                   observer.notify(data);
             });
       }
-
+   
       private observersPerEventType(eventType:string) {
             const observersType = this.observerCollection[eventType];
             if(!observersType){

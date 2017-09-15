@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { globalEventBus } from '../event-bus-experiment/event-bus';
 import { Lesson } from '../shared/model/lesson';
-import { Observer, LESSON_LIST_AVIALABLE } from '../event-bus-experiment/event-bus'
+import { Observer, LESSON_LIST_AVIALABLE, ADD_NEW_LESSON } from '../event-bus-experiment/event-bus'
 
 
 @Component({
@@ -16,6 +16,15 @@ export class LessonsListComponent implements Observer{
   constructor(){
     console.log('lesson List component subscribing to lessons data');
     globalEventBus.registerObserver(LESSON_LIST_AVIALABLE,this);
+
+    globalEventBus.registerObserver(ADD_NEW_LESSON,{
+      notify:lessonText=>{
+        console.log(lessonText);
+        if(lessonText!==null)
+           this.lessons.push({id:Math.random(),description:lessonText});
+      }
+    });
+
   }
 
   notify(data:Lesson[]){
@@ -24,6 +33,9 @@ export class LessonsListComponent implements Observer{
   }
 
   select(lesson){
-    
+  }
+
+  toggleLessonViewd(lesson:Lesson){
+    lesson.completed = !lesson.completed;
   }
 }

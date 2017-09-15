@@ -1,42 +1,65 @@
 import * as _ from 'lodash';
-
-export const LESSON_LIST_AVIALABLE = "NEW_LIST_AVIALABLE";
-export const ADD_NEW_LESSON = "NEW_LIST_AVIALABLE";
+import { Lesson } from '../shared/model/lesson';
 
 export interface Observer {
-      notify(data: any);
+      next(data: any);
 }
 
-interface Subject {
-      registerObserver(type:string,obs: Observer);
-      unRegisterObserver(type:string,obs: Observer);
-      notifyObservers(type:string,data: any);
+export interface Observable{
+      subscribe(obs: Observer);
+      ubsubscribe(obs: Observer);
 }
 
-class EventBus implements Subject {
-      private observerCollection : {[key:string]:Observer[]} = {};
-
-
-      registerObserver(type:string,obs: Observer) {
-            this.observersPerEventType(type).push(obs);
-      }
-      unRegisterObserver(type:string,obs: Observer) {
-            _.remove(this.observersPerEventType(type),item=>item===obs);
-      }
-      notifyObservers(type:string,data: any) {
-            this.observersPerEventType(type).forEach(observer=>{
-                  observer.notify(data);
-            });
-      }
-   
-      private observersPerEventType(eventType:string) {
-            const observersType = this.observerCollection[eventType];
-            if(!observersType){
-                  this.observerCollection[eventType] = [];
-            }
-
-            return this.observerCollection[eventType];
-      }
+interface Subject extends Observable,Observer{
+     
 }
 
-export const globalEventBus = new EventBus();
+class SubjectImpl implements Subject{
+      private observers:Observer[] = [];
+
+      constructor(){
+            this.observers = [];
+      }
+
+      subscribe( obs: Observer) {
+            this.observers.push(obs);
+      }
+      ubsubscribe(obs: Observer) {
+            _.remove(this.observers,observer=> observer===obs);
+      }
+      next(data: Lesson[]) {
+           this.observers.forEach(observer=>{
+                 observer.next(data);
+           });
+      }
+
+}
+
+
+class DataStore {
+      private lessons :Lesson[];
+      private lessonsListSubject = new SubjectImpl();
+
+      lessonsList$:Observable = {
+            subscribe:obs=>{
+                  this.lessonsListSubject.subscribe;
+                  obs.next(this.lessons);
+            },
+            ubsubscribe: obs=>this.lessonsListSubject.ubsubscribe
+      }; 
+      initializeLessonsList(lessonsList:Lesson[]){
+            this.lessons =  _.cloneDeep(lessonsList);
+            //this.broadcast();
+      }
+
+      broadcast(){
+            this.lessonsListSubject.next(_.cloneDeep(this.lessons));
+      }
+
+      addLesson(newLesson:Lesson){
+            this.lessons.push(_.cloneDeep(newLesson));
+      }
+      
+}
+
+export const store =  new DataStore();
